@@ -33,6 +33,7 @@ class iMembers_Admin_Settings {
         register_setting( 'imembers_settings_group', 'imembers_stripe_public_key' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_secret_key' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_webhook_secret' );
+        register_setting( 'imembers_settings_group', 'imembers_stripe_price_id' );
         register_setting( 'imembers_settings_group', 'imembers_enable_stripe' );
     }
 
@@ -70,6 +71,10 @@ class iMembers_Admin_Settings {
                                 有効
                             </label>
                         </td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">サブスクリプション 価格ID (Price ID)</th>
+                        <td><input type="text" name="imembers_stripe_price_id" value="<?php echo esc_attr( get_option('imembers_stripe_price_id') ); ?>" class="regular-text" placeholder="price_..." /></td>
                     </tr>
                     <tr valign="top">
                         <th scope="row">公開可能キー (Public Key)</th>

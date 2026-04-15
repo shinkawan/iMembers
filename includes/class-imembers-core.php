@@ -40,5 +40,10 @@ class iMembers_Core {
         require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-user-activity.php';
         $user_activity = new iMembers_User_Activity();
         $user_activity->init();
+
+        // Load Subscription module
+        require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-subscription.php';
+        $subscription = new iMembers_Subscription();
+        $subscription->init();
     }
 }

@@ -163,6 +163,8 @@ class iMembers_User_Activity {
                     <p>履歴はありません。</p>
                 <?php endif; ?>
             </div>
+
+            <?php do_action( 'imembers_mypage_subscription_section' ); ?>
         </div>
         <?php
         return ob_get_clean();
