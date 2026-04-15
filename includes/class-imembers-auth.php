@@ -10,16 +10,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 class iMembers_Auth {
 
     public function init() {
-        // Shortcodes
-        add_shortcode( 'imembers_login', array( $this, 'render_login_form' ) );
-        add_shortcode( 'imembers_register', array( $this, 'render_register_form' ) );
+        // Shortcodes (Both point to the same auth form)
+        add_shortcode( 'imembers_login', array( $this, 'render_auth_form' ) );
+        add_shortcode( 'imembers_register', array( $this, 'render_auth_form' ) );
 
         // AJAX handlers for OTP
         add_action( 'wp_ajax_nopriv_imembers_send_otp', array( $this, 'ajax_send_otp' ) );
         add_action( 'wp_ajax_nopriv_imembers_verify_otp', array( $this, 'ajax_verify_otp' ) );
     }
 
-    public function render_login_form() {
+    /**
+     * Render Unified Auth Form (Login / Register)
+     */
+    public function render_auth_form() {
         if ( is_user_logged_in() ) {
             return '<p>すでにログインしています。<a href="' . esc_url( wp_logout_url( home_url() ) ) . '">ログアウト</a></p>';
         }
@@ -27,11 +30,6 @@ class iMembers_Auth {
         ob_start();
         iMembers_Core::get_template( 'auth-login-form' );
         return ob_get_clean();
-    }
-
-    public function render_register_form() {
-        // Register and login process are the same for passwordless OTP
-        return $this->render_login_form();
     }
 
     public function ajax_send_otp() {

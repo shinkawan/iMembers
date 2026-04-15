@@ -10,8 +10,7 @@ iMembersプラグインのインストールから、Stripe決済・SNSログイ
     WordPress管理画面の「プラグイン」から `iMembers` を有効化します。
 2.  **固定ページの確認**: 
     有効化時に以下のページが自動生成されます。
-    - **ログイン**: `[imembers_login]`
-    - **会員登録**: `[imembers_register]`
+    - **ログイン / 新規登録**: `[imembers_login]`
     - **マイページ**: `[imembers_mypage]`
     ※ ページ名やURL（スラッグ）は自由に変更可能ですが、ショートコードは消さないでください。
 

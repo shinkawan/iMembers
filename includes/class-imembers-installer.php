@@ -31,12 +31,8 @@ class iMembers_Installer {
     private static function create_default_pages() {
         $pages = array(
             'imembers-login' => array(
-                'title'   => 'ログイン',
+                'title'   => 'ログイン / 新規登録',
                 'content' => '[imembers_login]',
-            ),
-            'imembers-register' => array(
-                'title'   => '会員登録',
-                'content' => '[imembers_register]',
             ),
             'imembers-mypage' => array(
                 'title'   => 'マイページ',
