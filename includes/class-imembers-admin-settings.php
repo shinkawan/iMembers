@@ -39,6 +39,7 @@ class iMembers_Admin_Settings {
         register_setting( 'imembers_settings_group', 'imembers_line_client_id' );
         register_setting( 'imembers_settings_group', 'imembers_line_client_secret' );
         register_setting( 'imembers_settings_group', 'imembers_google_client_id' );
+        register_setting( 'imembers_settings_group', 'imembers_google_client_secret' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_public_key' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_secret_key' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_webhook_secret' );
@@ -68,6 +69,10 @@ class iMembers_Admin_Settings {
                     <tr valign="top">
                         <th scope="row">Google Client ID</th>
                         <td><input type="text" name="imembers_google_client_id" value="<?php echo esc_attr( get_option('imembers_google_client_id') ); ?>" class="regular-text" /></td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">Google Client Secret</th>
+                        <td><input type="password" name="imembers_google_client_secret" value="<?php echo esc_attr( get_option('imembers_google_client_secret') ); ?>" class="regular-text" /></td>
                     </tr>
                 </table>
 
