@@ -42,12 +42,12 @@ document.addEventListener('DOMContentLoaded', function() {
             this.innerText = 'リダイレクト中...';
             this.disabled = true;
 
-            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            fetch(imembers_ajax.url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'action=imembers_sns_login&provider=' + encodeURIComponent(provider)
+                body: 'action=imembers_sns_login&provider=' + encodeURIComponent(provider) + '&nonce=' + imembers_ajax.nonce
             })
             .then(res => res.json())
             .then(data => {
@@ -72,12 +72,12 @@ document.addEventListener('DOMContentLoaded', function() {
             sendBtn.disabled = true;
             document.getElementById('imembers-email-message').innerText = '送信中...';
 
-            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            fetch(imembers_ajax.url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'action=imembers_send_otp&email=' + encodeURIComponent(email)
+                body: 'action=imembers_send_otp&email=' + encodeURIComponent(email) + '&nonce=' + imembers_ajax.nonce
             })
             .then(res => res.json())
             .then(data => {
@@ -104,12 +104,12 @@ document.addEventListener('DOMContentLoaded', function() {
             verifyBtn.disabled = true;
             document.getElementById('imembers-otp-message').innerText = '確認中...';
 
-            fetch('<?php echo admin_url('admin-ajax.php'); ?>', {
+            fetch(imembers_ajax.url, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'action=imembers_verify_otp&email=' + encodeURIComponent(email) + '&otp=' + encodeURIComponent(otp)
+                body: 'action=imembers_verify_otp&email=' + encodeURIComponent(email) + '&otp=' + encodeURIComponent(otp) + '&nonce=' + imembers_ajax.nonce
             })
             .then(res => res.json())
             .then(data => {

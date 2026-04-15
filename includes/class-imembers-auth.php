@@ -35,6 +35,8 @@ class iMembers_Auth {
     }
 
     public function ajax_send_otp() {
+        check_ajax_referer( 'imembers_ajax_nonce', 'nonce' );
+
         $email = sanitize_email( $_POST['email'] ?? '' );
         if ( ! is_email( $email ) ) {
             wp_send_json_error( array( 'message' => '有効なメールアドレスを入力してください。' ) );
@@ -63,6 +65,8 @@ class iMembers_Auth {
     }
 
     public function ajax_verify_otp() {
+        check_ajax_referer( 'imembers_ajax_nonce', 'nonce' );
+
         $email = sanitize_email( $_POST['email'] ?? '' );
         $otp = sanitize_text_field( $_POST['otp'] ?? '' );
 

@@ -35,6 +35,8 @@ class iMembers_Subscription {
      * Create Stripe Checkout Session (Subscription)
      */
     public function ajax_create_checkout_session() {
+        check_ajax_referer( 'imembers_ajax_nonce', 'nonce' );
+
         if ( ! is_user_logged_in() ) {
             wp_send_json_error( array( 'message' => 'ログインが必要です。' ) );
         }
@@ -91,6 +93,8 @@ class iMembers_Subscription {
      * Create Stripe Customer Portal Session
      */
     public function ajax_create_portal_session() {
+        check_ajax_referer( 'imembers_ajax_nonce', 'nonce' );
+
         if ( ! is_user_logged_in() ) {
             wp_send_json_error();
         }
@@ -134,7 +138,12 @@ class iMembers_Subscription {
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
         $endpoint_secret = get_option( 'imembers_stripe_webhook_secret' );
 
-        // Verification logic (simplified for stub)
+        // Verification logic
+        if ( ! $this->verify_stripe_signature( $payload, $sig_header, $endpoint_secret ) ) {
+            status_header( 403 );
+            exit;
+        }
+
         $event = json_decode( $payload, true );
         if ( ! $event ) {
             status_header( 400 );
@@ -144,29 +153,72 @@ class iMembers_Subscription {
         switch ( $event['type'] ) {
             case 'checkout.session.completed':
                 $session = $event['data']['object'];
-                $user_id = $session['metadata']['user_id'];
-                update_user_meta( $user_id, '_imembers_pro_subscriber', '1' );
-                update_user_meta( $user_id, '_imembers_stripe_customer_id', $session['customer'] );
+                $user_id = $session['metadata']['user_id'] ?? 0;
+                if ( $user_id ) {
+                    update_user_meta( $user_id, '_imembers_pro_subscriber', '1' );
+                    update_user_meta( $user_id, '_imembers_stripe_customer_id', $session['customer'] );
+                }
                 break;
             
             case 'customer.subscription.deleted':
             case 'invoice.payment_failed':
-                // Downgrade user
+            case 'customer.subscription.updated':
                 $subscription = $event['data']['object'];
+                $status = $subscription['status'];
                 $customer_id = $subscription['customer'];
+
                 $user = get_users( array(
                     'meta_key'   => '_imembers_stripe_customer_id',
                     'meta_value' => $customer_id,
                     'number'     => 1,
                 ) );
+
                 if ( ! empty( $user ) ) {
-                    delete_user_meta( $user[0]->ID, '_imembers_pro_subscriber' );
+                    $user_id = $user[0]->ID;
+                    if ( $status === 'active' || $status === 'trialing' ) {
+                        update_user_meta( $user_id, '_imembers_pro_subscriber', '1' );
+                    } else {
+                        delete_user_meta( $user_id, '_imembers_pro_subscriber' );
+                    }
                 }
                 break;
         }
 
         status_header( 200 );
         exit;
+    }
+
+    /**
+     * Verify Stripe Webhook Signature
+     */
+    private function verify_stripe_signature( $payload, $sig_header, $secret ) {
+        if ( ! $sig_header || ! $secret ) {
+            return false;
+        }
+
+        // Parse the sig_header
+        $pairs = explode( ',', $sig_header );
+        $t = '';
+        $v1 = '';
+        foreach ( $pairs as $pair ) {
+            $parts = explode( '=', $pair, 2 );
+            if ( count( $parts ) === 2 ) {
+                if ( trim( $parts[0] ) === 't' ) $t = $parts[1];
+                if ( trim( $parts[0] ) === 'v1' ) $v1 = $parts[1];
+            }
+        }
+
+        if ( ! $t || ! $v1 ) return false;
+
+        // Check timestamp (within 5 minutes)
+        if ( abs( time() - intval( $t ) ) > 300 ) {
+            return false;
+        }
+
+        $signed_payload = $t . '.' . $payload;
+        $expected_sig = hash_hmac( 'sha256', $signed_payload, $secret );
+
+        return hash_equals( $expected_sig, $v1 );
     }
 
     /**
@@ -198,7 +250,10 @@ class iMembers_Subscription {
                 checkoutBtn.addEventListener('click', function() {
                     checkoutBtn.disabled = true;
                     checkoutBtn.innerText = 'リダイレクト中...';
-                    jQuery.post(imembers_ajax.url, { action: 'imembers_create_checkout_session' }, function(res) {
+                    jQuery.post(imembers_ajax.url, { 
+                        action: 'imembers_create_checkout_session',
+                        nonce: imembers_ajax.nonce 
+                    }, function(res) {
                         if (res.success) {
                             window.location.href = res.data.url;
                         } else {
@@ -213,7 +268,10 @@ class iMembers_Subscription {
             if (portalBtn) {
                 portalBtn.addEventListener('click', function() {
                     portalBtn.disabled = true;
-                    jQuery.post(imembers_ajax.url, { action: 'imembers_create_portal_session' }, function(res) {
+                    jQuery.post(imembers_ajax.url, { 
+                        action: 'imembers_create_portal_session',
+                        nonce: imembers_ajax.nonce 
+                    }, function(res) {
                         if (res.success) {
                             window.location.href = res.data.url;
                         } else {

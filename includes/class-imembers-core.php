@@ -53,6 +53,18 @@ class iMembers_Core {
 
         // Security: Set login expiration to 30 days
         add_filter( 'auth_cookie_expiration', array( $this, 'set_login_expiration' ), 10, 3 );
+
+        // Enqueue Shared Assets
+        add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_assets' ) );
+    }
+
+    public function enqueue_assets() {
+        // Enqueue a dummy script to hang our localized data onto if no other script is available,
+        // or just use a common handle. We'll use 'jquery' as a dependency to ensure it loads early.
+        wp_localize_script( 'jquery', 'imembers_ajax', array(
+            'url'   => admin_url( 'admin-ajax.php' ),
+            'nonce' => wp_create_nonce( 'imembers_ajax_nonce' )
+        ) );
     }
 
     public function set_login_expiration( $expiration, $user_id, $remember ) {

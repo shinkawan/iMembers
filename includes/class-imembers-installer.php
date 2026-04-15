@@ -46,6 +46,8 @@ class iMembers_Installer {
 
         foreach ( $pages as $slug => $page_data ) {
             $existing_page = get_page_by_path( $slug );
+            $option_name = 'imembers_page_' . str_replace('-', '_', $slug);
+            $page_id = 0;
 
             if ( ! $existing_page ) {
                 $page_id = wp_insert_post( array(
@@ -57,10 +59,14 @@ class iMembers_Installer {
                     'ping_status'    => 'closed',
                     'comment_status' => 'closed',
                 ) );
+            } else {
+                $page_id = $existing_page->ID;
+            }
 
-                // Save the generated page IDs into options so we can track and link to them easily
-                if ( ! is_wp_error( $page_id ) ) {
-                    update_option( 'imembers_page_' . str_replace('-', '_', $slug), $page_id );
+            // Always ensure the option is up to date if we have a valid page ID
+            if ( $page_id && ! is_wp_error( $page_id ) ) {
+                if ( ! get_option( $option_name ) ) {
+                    update_option( $option_name, $page_id );
                 }
             }
         }

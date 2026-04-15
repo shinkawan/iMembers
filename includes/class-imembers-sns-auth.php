@@ -15,6 +15,8 @@ class iMembers_SNS_Auth {
     }
 
     public function ajax_sns_login_redirect() {
+        check_ajax_referer( 'imembers_ajax_nonce', 'nonce' );
+
         $provider = isset( $_POST['provider'] ) ? sanitize_text_field( $_POST['provider'] ) : '';
         
         if ( $provider === 'line' ) {

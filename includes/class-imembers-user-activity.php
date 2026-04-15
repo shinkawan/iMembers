@@ -29,17 +29,13 @@ class iMembers_User_Activity {
 
     public function enqueue_assets() {
         wp_enqueue_script( 'imembers-activity', IMEMBERS_PLUGIN_URL . 'assets/js/activity.js', array('jquery'), IMEMBERS_VERSION, true );
-        wp_localize_script( 'imembers-activity', 'imembers_ajax', array(
-            'url' => admin_url('admin-ajax.php'),
-            'nonce' => wp_create_nonce('imembers_activity_nonce')
-        ) );
     }
 
     /**
      * Favorites logic
      */
     public function ajax_toggle_favorite() {
-        check_ajax_referer( 'imembers_activity_nonce', 'nonce' );
+        check_ajax_referer( 'imembers_ajax_nonce', 'nonce' );
 
         if ( ! is_user_logged_in() ) {
             wp_send_json_error( array( 'message' => 'お気に入り登録にはログインが必要です。' ) );

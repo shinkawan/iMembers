@@ -176,6 +176,7 @@ class iMembers_Content_Restriction {
     public function add_term_restriction_field() {
         ?>
         <div class="form-field">
+            <?php wp_nonce_field( 'imembers_term_restriction_nonce', 'imembers_term_restriction_nonce_field' ); ?>
             <label for="imembers_term_restricted">
                 <input type="checkbox" name="imembers_term_restricted" id="imembers_term_restricted" value="1" />
                 このカテゴリーを会員限定にする
@@ -194,6 +195,7 @@ class iMembers_Content_Restriction {
         <tr class="form-field">
             <th scope="row"><label for="imembers_term_restricted">会員限定</label></th>
             <td>
+                <?php wp_nonce_field( 'imembers_term_restriction_nonce', 'imembers_term_restriction_nonce_field' ); ?>
                 <label>
                     <input type="checkbox" name="imembers_term_restricted" id="imembers_term_restricted" value="1" <?php checked( $is_restricted, '1' ); ?> />
                     このカテゴリーを会員限定にする
@@ -208,6 +210,10 @@ class iMembers_Content_Restriction {
      * Save Term Restriction Field
      */
     public function save_term_restriction_field( $term_id ) {
+        if ( ! isset( $_POST['imembers_term_restriction_nonce_field'] ) || ! wp_verify_nonce( $_POST['imembers_term_restriction_nonce_field'], 'imembers_term_restriction_nonce' ) ) {
+            return;
+        }
+
         if ( isset( $_POST['imembers_term_restricted'] ) ) {
             update_term_meta( $term_id, '_imembers_is_restricted', '1' );
         } else {

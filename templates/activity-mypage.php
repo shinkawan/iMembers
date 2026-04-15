@@ -14,11 +14,12 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <?php if ( ! empty( $favorites ) ) : ?>
             <ul class="imembers-list">
                 <?php foreach ( $favorites as $pid ) : ?>
-                    <li><a href="<?php echo get_permalink( $pid ); ?>"><?php echo get_the_title( $pid ); ?></a></li>
+                    <li><a href="<?php echo esc_url( get_permalink( $pid ) ); ?>"><?php echo esc_html( get_the_title( $pid ) ); ?></a></li>
                 <?php endforeach; ?>
             </ul>
         <?php else : ?>
-            <p>お気に入りはまだありません。</p>
+            <p>お気に入りはまだありません。気になる記事の★ボタンを押してみましょう！</p>
+            <p><a href="<?php echo esc_url( home_url() ); ?>" class="button">記事を読みに行く</a></p>
         <?php endif; ?>
     </div>
 
@@ -27,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) exit;
         <?php if ( ! empty( $history ) ) : ?>
             <ul class="imembers-list">
                 <?php foreach ( $history as $pid ) : ?>
-                    <li><a href="<?php echo get_permalink( $pid ); ?>"><?php echo get_the_title( $pid ); ?></a></li>
+                    <li><a href="<?php echo esc_url( get_permalink( $pid ) ); ?>"><?php echo esc_html( get_the_title( $pid ) ); ?></a></li>
                 <?php endforeach; ?>
             </ul>
         <?php else : ?>
