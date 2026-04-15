@@ -44,6 +44,7 @@ class iMembers_Admin_Settings {
         register_setting( 'imembers_settings_group', 'imembers_stripe_webhook_secret' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_price_id' );
         register_setting( 'imembers_settings_group', 'imembers_enable_stripe' );
+        register_setting( 'imembers_settings_group', 'imembers_restricted_archives' ); // Array of post type names
     }
 
     public function render_settings_page() {
@@ -97,6 +98,38 @@ class iMembers_Admin_Settings {
                         <th scope="row">Webhook シークレット</th>
                         <td><input type="password" name="imembers_stripe_webhook_secret" value="<?php echo esc_attr( get_option('imembers_stripe_webhook_secret') ); ?>" class="regular-text" /></td>
                     </tr>
+                </table>
+
+                <h2>アーカイブ閲覧制限設定</h2>
+                <p>チェックを入れたページのアーカイブ（一覧）ページは会員限定になります。※個別のカテゴリー制限はカテゴリー編集画面で行ってください。</p>
+                <table class="form-table">
+                    <?php
+                    $restricted_archives = get_option( 'imembers_restricted_archives', array() );
+                    if ( ! is_array( $restricted_archives ) ) $restricted_archives = array();
+
+                    // Get post types that have archives
+                    $post_types = get_post_types( array( 'public' => true, 'has_archive' => true ), 'objects' );
+                    ?>
+                    <tr valign="top">
+                        <th scope="row">ブログ投稿一覧 (HOME / 投稿記事一覧)</th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="imembers_restricted_archives[]" value="home" <?php checked( in_array( 'home', $restricted_archives ) ); ?> />
+                                制限する
+                            </label>
+                        </td>
+                    </tr>
+                    <?php foreach ( $post_types as $pt ) : ?>
+                    <tr valign="top">
+                        <th scope="row"><?php echo esc_html( $pt->label ); ?> アーカイブ</th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="imembers_restricted_archives[]" value="<?php echo esc_attr( $pt->name ); ?>" <?php checked( in_array( $pt->name, $restricted_archives ) ); ?> />
+                                制限する (<code>/<?php echo esc_html( $pt->name ); ?>/</code>)
+                            </label>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
                 </table>
 
                 <?php submit_button(); ?>

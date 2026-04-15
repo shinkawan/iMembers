@@ -109,11 +109,27 @@ class iMembers_Content_Restriction {
                     }
                 }
             }
-        } elseif ( is_category() || is_tag() || is_tax() ) {
-            // Check archive restriction
-            $term_id = get_queried_object_id();
-            if ( get_term_meta( $term_id, '_imembers_is_restricted', true ) === '1' ) {
-                $is_restricted = true;
+        } else {
+            // Check global archive restrictions
+            $restricted_archives = get_option( 'imembers_restricted_archives', array() );
+            if ( ! is_array( $restricted_archives ) ) $restricted_archives = array();
+
+            if ( is_home() ) {
+                if ( in_array( 'home', $restricted_archives ) ) {
+                    $is_restricted = true;
+                }
+            } elseif ( is_post_type_archive() ) {
+                $post_type = get_query_var( 'post_type' );
+                if ( is_array( $post_type ) ) $post_type = reset( $post_type );
+                if ( in_array( $post_type, $restricted_archives ) ) {
+                    $is_restricted = true;
+                }
+            } elseif ( is_category() || is_tag() || is_tax() ) {
+                // Check specific term restriction
+                $term_id = get_queried_object_id();
+                if ( get_term_meta( $term_id, '_imembers_is_restricted', true ) === '1' ) {
+                    $is_restricted = true;
+                }
             }
         }
 
