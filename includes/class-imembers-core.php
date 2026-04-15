@@ -59,4 +59,19 @@ class iMembers_Core {
         // Force 30 days expiration (30 * 24 * 60 * 60)
         return 30 * DAY_IN_SECONDS;
     }
+
+    /**
+     * Helper to load template files from the plugin
+     */
+    public static function get_template( $template_name, $args = array() ) {
+        if ( $args && is_array( $args ) ) {
+            extract( $args );
+        }
+
+        $template_path = IMEMBERS_PLUGIN_DIR . 'templates/' . $template_name . '.php';
+        
+        if ( file_exists( $template_path ) ) {
+            include $template_path;
+        }
+    }
 }

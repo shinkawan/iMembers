@@ -14,6 +14,7 @@ class iMembers_Installer {
      */
     public static function activate() {
         self::create_default_pages();
+        self::create_activity_table();
         flush_rewrite_rules();
     }
 
@@ -63,5 +64,29 @@ class iMembers_Installer {
                 }
             }
         }
+    }
+
+    /**
+     * Create dedicated database table for user activities (Favorites, History)
+     */
+    private static function create_activity_table() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'imembers_activity';
+        $charset_collate = $wpdb->get_charset_collate();
+
+        $sql = "CREATE TABLE $table_name (
+            id bigint(20) NOT NULL AUTO_INCREMENT,
+            user_id bigint(20) NOT NULL,
+            post_id bigint(20) NOT NULL,
+            activity_type varchar(20) NOT NULL,
+            created_at datetime DEFAULT CURRENT_TIMESTAMP NOT NULL,
+            PRIMARY KEY  (id),
+            KEY user_id (user_id),
+            KEY post_id (post_id),
+            KEY activity_type (activity_type)
+        ) $charset_collate;";
+
+        require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+        dbDelta( $sql );
     }
 }

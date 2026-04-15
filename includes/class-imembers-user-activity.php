@@ -45,6 +45,8 @@ class iMembers_User_Activity {
             wp_send_json_error( array( 'message' => 'お気に入り登録にはログインが必要です。' ) );
         }
 
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'imembers_activity';
         $user_id = get_current_user_id();
         $post_id = intval( $_POST['post_id'] );
 
@@ -52,22 +54,27 @@ class iMembers_User_Activity {
             wp_send_json_error( array( 'message' => '無効な投稿IDです。' ) );
         }
 
-        $favorites = get_user_meta( $user_id, '_imembers_favorites', true );
-        if ( ! is_array( $favorites ) ) {
-            $favorites = array();
-        }
+        // Check if exists
+        $id = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM $table_name WHERE user_id = %d AND post_id = %d AND activity_type = 'favorite'",
+            $user_id, $post_id
+        ) );
 
-        if ( in_array( $post_id, $favorites ) ) {
+        if ( $id ) {
             // Remove
-            $favorites = array_diff( $favorites, array( $post_id ) );
+            $wpdb->delete( $table_name, array( 'id' => $id ), array( '%d' ) );
             $action = 'removed';
         } else {
             // Add
-            $favorites[] = $post_id;
+            $wpdb->insert( $table_name, array(
+                'user_id'       => $user_id,
+                'post_id'       => $post_id,
+                'activity_type' => 'favorite',
+                'created_at'    => current_time( 'mysql' )
+            ), array( '%d', '%d', '%s', '%s' ) );
             $action = 'added';
         }
 
-        update_user_meta( $user_id, '_imembers_favorites', $favorites );
         wp_send_json_success( array( 'action' => $action ) );
     }
 
@@ -79,14 +86,16 @@ class iMembers_User_Activity {
             return '';
         }
 
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'imembers_activity';
         $post_id = get_the_ID();
         $user_id = get_current_user_id();
-        $favorites = get_user_meta( $user_id, '_imembers_favorites', true );
-        if ( ! is_array( $favorites ) ) {
-            $favorites = array();
-        }
 
-        $is_favorited = in_array( $post_id, $favorites );
+        $is_favorited = $wpdb->get_var( $wpdb->prepare(
+            "SELECT id FROM $table_name WHERE user_id = %d AND post_id = %d AND activity_type = 'favorite'",
+            $user_id, $post_id
+        ) );
+
         $text = $is_favorited ? '★ お気に入り解除' : '☆ お気に入り登録';
         $class = $is_favorited ? 'favorited' : '';
 
@@ -98,22 +107,39 @@ class iMembers_User_Activity {
      */
     public function track_browsing_history() {
         if ( is_singular() && is_user_logged_in() ) {
+            global $wpdb;
+            $table_name = $wpdb->prefix . 'imembers_activity';
             $user_id = get_current_user_id();
             $post_id = get_queried_object_id();
 
-            $history = get_user_meta( $user_id, '_imembers_history', true );
-            if ( ! is_array( $history ) ) {
-                $history = array();
+            // Check if this post is already in the history to avoid duplicates
+            $wpdb->delete( $table_name, array(
+                'user_id'       => $user_id,
+                'post_id'       => $post_id,
+                'activity_type' => 'history'
+            ), array( '%d', '%d', '%s' ) );
+
+            // Insert new history record
+            $wpdb->insert( $table_name, array(
+                'user_id'       => $user_id,
+                'post_id'       => $post_id,
+                'activity_type' => 'history',
+                'created_at'    => current_time( 'mysql' )
+            ), array( '%d', '%d', '%s', '%s' ) );
+
+            // Limit to 20 items: delete older records for this user
+            $ids_to_keep = $wpdb->get_col( $wpdb->prepare(
+                "SELECT id FROM $table_name WHERE user_id = %d AND activity_type = 'history' ORDER BY created_at DESC LIMIT 20",
+                $user_id
+            ) );
+
+            if ( ! empty( $ids_to_keep ) ) {
+                $placeholders = implode( ',', array_fill( 0, count( $ids_to_keep ), '%d' ) );
+                $wpdb->query( $wpdb->prepare(
+                    "DELETE FROM $table_name WHERE user_id = %d AND activity_type = 'history' AND id NOT IN ($placeholders)",
+                    array_merge( array( $user_id ), $ids_to_keep )
+                ) );
             }
-
-            // Remove if already exists to move to top
-            $history = array_diff( $history, array( $post_id ) );
-            array_unshift( $history, $post_id );
-
-            // Limit to 20 items
-            $history = array_slice( $history, 0, 20 );
-
-            update_user_meta( $user_id, '_imembers_history', $history );
         }
     }
 
@@ -126,47 +152,29 @@ class iMembers_User_Activity {
             return '<p>マイページを表示するには<a href="' . esc_url( $login_url ) . '">ログイン</a>が必要です。</p>';
         }
 
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'imembers_activity';
         $user_id = get_current_user_id();
         $user = get_userdata( $user_id );
-        $favorites = get_user_meta( $user_id, '_imembers_favorites', true );
-        $history = get_user_meta( $user_id, '_imembers_history', true );
+
+        // Fetch Favorites
+        $favorites = $wpdb->get_col( $wpdb->prepare(
+            "SELECT post_id FROM $table_name WHERE user_id = %d AND activity_type = 'favorite' ORDER BY created_at DESC",
+            $user_id
+        ) );
+
+        // Fetch History
+        $history = $wpdb->get_col( $wpdb->prepare(
+            "SELECT post_id FROM $table_name WHERE user_id = %d AND activity_type = 'history' ORDER BY created_at DESC",
+            $user_id
+        ) );
 
         ob_start();
-        ?>
-        <div class="imembers-mypage">
-            <h2>こんにちは、<?php echo esc_html( $user->display_name ); ?> さん</h2>
-            <p>メールアドレス: <?php echo esc_html( $user->user_email ); ?></p>
-            <p><a href="<?php echo esc_url( wp_logout_url( home_url() ) ); ?>">ログアウト</a></p>
-
-            <div class="imembers-section" style="margin-top: 30px;">
-                <h3>お気に入り一覧</h3>
-                <?php if ( ! empty( $favorites ) ) : ?>
-                    <ul class="imembers-list">
-                        <?php foreach ( $favorites as $pid ) : ?>
-                            <li><a href="<?php echo get_permalink( $pid ); ?>"><?php echo get_the_title( $pid ); ?></a></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else : ?>
-                    <p>お気に入りはまだありません。</p>
-                <?php endif; ?>
-            </div>
-
-            <div class="imembers-section" style="margin-top: 30px;">
-                <h3>閲覧履歴</h3>
-                <?php if ( ! empty( $history ) ) : ?>
-                    <ul class="imembers-list">
-                        <?php foreach ( $history as $pid ) : ?>
-                            <li><a href="<?php echo get_permalink( $pid ); ?>"><?php echo get_the_title( $pid ); ?></a></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php else : ?>
-                    <p>履歴はありません。</p>
-                <?php endif; ?>
-            </div>
-
-            <?php do_action( 'imembers_mypage_subscription_section' ); ?>
-        </div>
-        <?php
+        iMembers_Core::get_template( 'activity-mypage', array(
+            'user'      => $user,
+            'favorites' => $favorites,
+            'history'   => $history
+        ) );
         return ob_get_clean();
     }
 

@@ -14,6 +14,12 @@ class iMembers_Content_Restriction {
         add_action( 'add_meta_boxes', array( $this, 'add_restriction_meta_box' ) );
         add_action( 'save_post', array( $this, 'save_restriction_meta_box' ) );
 
+        // Category/Term restriction fields
+        add_action( 'category_add_form_fields', array( $this, 'add_term_restriction_field' ) );
+        add_action( 'category_edit_form_fields', array( $this, 'edit_term_restriction_field' ) );
+        add_action( 'create_category', array( $this, 'save_term_restriction_field' ) );
+        add_action( 'edited_category', array( $this, 'save_term_restriction_field' ) );
+
         // Shortcode for parsing members_only content
         add_shortcode( 'members_only', array( $this, 'members_only_shortcode' ) );
         add_shortcode( 'imembers_download', array( $this, 'download_shortcode' ) );
@@ -80,13 +86,39 @@ class iMembers_Content_Restriction {
     }
 
     public function check_access() {
+        if ( is_user_logged_in() ) {
+            return;
+        }
+
+        $is_restricted = false;
+
         if ( is_singular() ) {
             $post_id = get_queried_object_id();
-            $is_restricted = get_post_meta( $post_id, '_imembers_is_restricted', true );
-
-            if ( $is_restricted === '1' && ! is_user_logged_in() ) {
-                $this->redirect_to_login();
+            // Check post direct restriction
+            if ( get_post_meta( $post_id, '_imembers_is_restricted', true ) === '1' ) {
+                $is_restricted = true;
+            } else {
+                // Check categories of the post
+                $categories = get_the_category( $post_id );
+                if ( $categories ) {
+                    foreach ( $categories as $cat ) {
+                        if ( get_term_meta( $cat->term_id, '_imembers_is_restricted', true ) === '1' ) {
+                            $is_restricted = true;
+                            break;
+                        }
+                    }
+                }
             }
+        } elseif ( is_category() || is_tag() || is_tax() ) {
+            // Check archive restriction
+            $term_id = get_queried_object_id();
+            if ( get_term_meta( $term_id, '_imembers_is_restricted', true ) === '1' ) {
+                $is_restricted = true;
+            }
+        }
+
+        if ( $is_restricted ) {
+            $this->redirect_to_login();
         }
     }
 
@@ -111,10 +143,9 @@ class iMembers_Content_Restriction {
             $login_page_id = get_option( 'imembers_page_imembers_login' );
             $login_url = $login_page_id ? get_permalink( $login_page_id ) : wp_login_url();
             
-            return '<div class="imembers-teaser-notice" style="padding: 15px; border: 1px solid #ddd; background: #fafafa; margin: 20px 0; text-align: center;">' . 
-                   '<p><strong>この続きは会員限定です。</strong></p>' . 
-                   '<p>続きを読むには<a href="' . esc_url( $login_url ) . '">ログイン</a>または会員登録が必要です。</p>' . 
-                   '</div>';
+            ob_start();
+            iMembers_Core::get_template( 'restriction-teaser', array( 'login_url' => $login_url ) );
+            return ob_get_clean();
         }
     }
 
@@ -137,5 +168,50 @@ class iMembers_Content_Restriction {
         return '<div class="imembers-download-block" style="padding:15px; border:1px solid #0073aa; background:#f0f6fb; text-align:center;">' .
                '<a href="' . esc_url( $a['url'] ) . '" class="button button-primary" download>' . esc_html( $a['label'] ) . '</a>' .
                '</div>';
+    }
+
+    /**
+     * Term Restriction Fields (Add)
+     */
+    public function add_term_restriction_field() {
+        ?>
+        <div class="form-field">
+            <label for="imembers_term_restricted">
+                <input type="checkbox" name="imembers_term_restricted" id="imembers_term_restricted" value="1" />
+                このカテゴリーを会員限定にする
+            </label>
+            <p>このカテゴリーに属する記事および、このカテゴリーのアーカイブページを会員限定にします。</p>
+        </div>
+        <?php
+    }
+
+    /**
+     * Term Restriction Fields (Edit)
+     */
+    public function edit_term_restriction_field( $term ) {
+        $is_restricted = get_term_meta( $term->term_id, '_imembers_is_restricted', true );
+        ?>
+        <tr class="form-field">
+            <th scope="row"><label for="imembers_term_restricted">会員限定</label></th>
+            <td>
+                <label>
+                    <input type="checkbox" name="imembers_term_restricted" id="imembers_term_restricted" value="1" <?php checked( $is_restricted, '1' ); ?> />
+                    このカテゴリーを会員限定にする
+                </label>
+                <p class="description">このカテゴリーに属する記事およびアーカイブを制限します。</p>
+            </td>
+        </tr>
+        <?php
+    }
+
+    /**
+     * Save Term Restriction Field
+     */
+    public function save_term_restriction_field( $term_id ) {
+        if ( isset( $_POST['imembers_term_restricted'] ) ) {
+            update_term_meta( $term_id, '_imembers_is_restricted', '1' );
+        } else {
+            delete_term_meta( $term_id, '_imembers_is_restricted' );
+        }
     }
 }
