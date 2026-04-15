@@ -40,6 +40,8 @@ class iMembers_Admin_Settings {
         register_setting( 'imembers_settings_group', 'imembers_line_client_secret' );
         register_setting( 'imembers_settings_group', 'imembers_google_client_id' );
         register_setting( 'imembers_settings_group', 'imembers_google_client_secret' );
+        register_setting( 'imembers_settings_group', 'imembers_enable_line_login' );
+        register_setting( 'imembers_settings_group', 'imembers_enable_google_login' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_public_key' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_secret_key' );
         register_setting( 'imembers_settings_group', 'imembers_stripe_webhook_secret' );
@@ -59,12 +61,30 @@ class iMembers_Admin_Settings {
                 <h2>SNSログイン設定</h2>
                 <table class="form-table">
                     <tr valign="top">
+                        <th scope="row">LINEログイン を有効にする</th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="imembers_enable_line_login" value="1" <?php checked( 1, get_option( 'imembers_enable_line_login' ), true ); ?> />
+                                有効
+                            </label>
+                        </td>
+                    </tr>
+                    <tr valign="top">
                         <th scope="row">LINE Client ID (Channel ID)</th>
                         <td><input type="text" name="imembers_line_client_id" value="<?php echo esc_attr( get_option('imembers_line_client_id') ); ?>" class="regular-text" /></td>
                     </tr>
                     <tr valign="top">
                         <th scope="row">LINE Client Secret (Channel Secret)</th>
                         <td><input type="password" name="imembers_line_client_secret" value="<?php echo esc_attr( get_option('imembers_line_client_secret') ); ?>" class="regular-text" /></td>
+                    </tr>
+                    <tr valign="top">
+                        <th scope="row">Googleログイン を有効にする</th>
+                        <td>
+                            <label>
+                                <input type="checkbox" name="imembers_enable_google_login" value="1" <?php checked( 1, get_option( 'imembers_enable_google_login' ), true ); ?> />
+                                有効
+                            </label>
+                        </td>
                     </tr>
                     <tr valign="top">
                         <th scope="row">Google Client ID</th>
