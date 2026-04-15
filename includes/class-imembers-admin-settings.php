@@ -22,7 +22,16 @@ class iMembers_Admin_Settings {
             'imembers-settings',
             array( $this, 'render_settings_page' ),
             'dashicons-groups',
-            56
+            100
+        );
+
+        add_submenu_page(
+            'imembers-settings',
+            'iMembers マニュアル',
+            'マニュアル',
+            'manage_options',
+            'imembers-manual',
+            array( $this, 'render_manual_page' )
         );
     }
 
