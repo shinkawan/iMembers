@@ -25,5 +25,15 @@ class iMembers_Core {
         require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-content-restriction.php';
         $content_restriction = new iMembers_Content_Restriction();
         $content_restriction->init();
+
+        // Load Auth module
+        require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-auth.php';
+        $auth = new iMembers_Auth();
+        $auth->init();
+
+        // Load SNS Auth module
+        require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-sns-auth.php';
+        $sns_auth = new iMembers_SNS_Auth();
+        $sns_auth->init();
     }
 }
