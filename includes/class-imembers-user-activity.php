@@ -92,10 +92,18 @@ class iMembers_User_Activity {
             $user_id, $post_id
         ) );
 
-        $text = $is_favorited ? '★ お気に入り解除' : '☆ お気に入り登録';
         $class = $is_favorited ? 'favorited' : '';
+        $text = $is_favorited ? 'お気に入り解除' : 'お気に入り登録';
+        
+        $star_svg = '<svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>';
 
-        return '<button type="button" class="imembers-favorite-btn ' . esc_attr( $class ) . '" data-id="' . esc_attr( $post_id ) . '" style="padding:8px 15px; cursor:pointer;">' . esc_html( $text ) . '</button>';
+        return sprintf(
+            '<button type="button" class="imembers-favorite-btn %s" data-id="%d">%s <span>%s</span></button>',
+            esc_attr( $class ),
+            intval( $post_id ),
+            $star_svg,
+            esc_html( $text )
+        );
     }
 
     /**

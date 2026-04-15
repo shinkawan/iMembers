@@ -59,8 +59,13 @@ class iMembers_Core {
     }
 
     public function enqueue_assets() {
-        // Enqueue a dummy script to hang our localized data onto if no other script is available,
-        // or just use a common handle. We'll use 'jquery' as a dependency to ensure it loads early.
+        // Enqueue Fonts
+        wp_enqueue_style( 'imembers-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap', array(), null );
+
+        // Enqueue Modern CSS
+        wp_enqueue_style( 'imembers-style', IMEMBERS_PLUGIN_URL . 'assets/css/imembers-style.css', array(), IMEMBERS_VERSION );
+
+        // Enqueue Shared Data
         wp_localize_script( 'jquery', 'imembers_ajax', array(
             'url'   => admin_url( 'admin-ajax.php' ),
             'nonce' => wp_create_nonce( 'imembers_ajax_nonce' )

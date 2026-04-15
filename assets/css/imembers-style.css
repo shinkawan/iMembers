@@ -1,0 +1,211 @@
+:root {
+    --imembers-primary: #6366f1;
+    --imembers-primary-hover: #4f46e5;
+    --imembers-bg: #f8fafc;
+    --imembers-surface: #ffffff;
+    --imembers-text: #1e293b;
+    --imembers-text-muted: #64748b;
+    --imembers-border: #e2e8f0;
+    --imembers-radius: 12px;
+    --imembers-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --imembers-shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+/* Base Styles */
+.imembers-container {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: var(--imembers-text);
+    line-height: 1.6;
+}
+
+/* Card Style */
+.imembers-card {
+    background: var(--imembers-surface);
+    border: 1px solid var(--imembers-border);
+    border-radius: var(--imembers-radius);
+    padding: 24px;
+    box-shadow: var(--imembers-shadow);
+    margin-bottom: 24px;
+}
+
+/* Button Styles */
+.imembers-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+    text-decoration: none !important;
+}
+
+.imembers-btn-primary {
+    background: var(--imembers-primary);
+    color: #fff !important;
+}
+
+.imembers-btn-primary:hover {
+    background: var(--imembers-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.imembers-btn-outline {
+    background: transparent;
+    border: 1px solid var(--imembers-border);
+    color: var(--imembers-text);
+}
+
+.imembers-btn-outline:hover {
+    background: var(--imembers-bg);
+}
+
+/* Input Styles */
+.imembers-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--imembers-border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    transition: border-color 0.2s;
+    font-size: 16px;
+}
+
+.imembers-input:focus {
+    outline: none;
+    border-color: var(--imembers-primary);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* Auth Specific */
+.imembers-auth-container {
+    max-width: 450px;
+    margin: 40px auto;
+}
+
+.imembers-sns-grid {
+    display: grid;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.imembers-sns-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 8px;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+
+.imembers-sns-btn-line { background: #06C755; color: #fff; }
+.imembers-sns-btn-google { background: #fff; color: #757575; border: 1px solid #ddd; }
+
+/* My Page Layout */
+.imembers-profile-header {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 32px;
+}
+
+.imembers-avatar-circle {
+    width: 64px;
+    height: 64px;
+    background: var(--imembers-primary);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.imembers-activity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.imembers-activity-item {
+    background: var(--imembers-surface);
+    padding: 16px;
+    border: 1px solid var(--imembers-border);
+    border-radius: 10px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.imembers-activity-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--imembers-shadow);
+}
+
+/* Teaser / Lock UI */
+.imembers-teaser-lock {
+    position: relative;
+    padding: 40px 20px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border: 1px solid var(--imembers-border);
+    border-radius: var(--imembers-radius);
+    text-align: center;
+    overflow: hidden;
+}
+
+.imembers-lock-icon {
+    font-size: 48px;
+    color: var(--imembers-primary);
+    margin-bottom: 16px;
+    opacity: 0.8;
+}
+
+/* Favorite Button CSS Component */
+.imembers-favorite-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 6px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.imembers-favorite-btn.favorited {
+    background: #fff1f2;
+    border-color: #fecaca;
+    color: #e11d48;
+}
+
+.imembers-favorite-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+}
+
+.imembers-favorite-btn.favorited svg {
+    fill: currentColor;
+}
+
+/* Message Box */
+.imembers-message {
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 14px;
+    display: none;
+}
+
+.imembers-message-error { background: #fef2f2; color: #991b1b; border: 1px solid #fee2e2; }
+.imembers-message-success { background: #f0fdf4; color: #166534; border: 1px solid #dcfce7; }
