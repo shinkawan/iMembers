@@ -102,7 +102,8 @@ class iMembers_Admin_Settings {
                 <?php submit_button(); ?>
             </form>
         </div>
-        <?php
+    }
+
     public function render_manual_page() {
         ob_start();
         iMembers_Core::get_template( 'admin-manual' );
