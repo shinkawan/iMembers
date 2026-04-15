@@ -1,0 +1,11 @@
+# ignore IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ignore node modules if we add them later
+node_modules/
+
+# Ignore test and dev files
+*.log
