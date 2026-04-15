@@ -16,6 +16,7 @@ class iMembers_Content_Restriction {
 
         // Shortcode for parsing members_only content
         add_shortcode( 'members_only', array( $this, 'members_only_shortcode' ) );
+        add_shortcode( 'imembers_download', array( $this, 'download_shortcode' ) );
 
         // Template redirect for checking access
         add_action( 'template_redirect', array( $this, 'check_access' ) );
@@ -115,5 +116,26 @@ class iMembers_Content_Restriction {
                    '<p>続きを読むには<a href="' . esc_url( $login_url ) . '">ログイン</a>または会員登録が必要です。</p>' . 
                    '</div>';
         }
+    }
+
+    public function download_shortcode( $atts ) {
+        $a = shortcode_atts( array(
+            'url'   => '',
+            'label' => 'ファイルをダウンロード',
+        ), $atts );
+
+        if ( ! is_user_logged_in() ) {
+            return '<div class="imembers-download-block" style="padding:10px; border:1px dashed #ccc; background:#f9f9f9; text-align:center;">' .
+                   '<p>ダウンロードは会員限定です。</p>' .
+                   '</div>';
+        }
+
+        // Potential addition: check for PRO subscriber status if needed
+        // $user_id = get_current_user_id();
+        // $is_pro = get_user_meta( $user_id, '_imembers_pro_subscriber', true );
+
+        return '<div class="imembers-download-block" style="padding:15px; border:1px solid #0073aa; background:#f0f6fb; text-align:center;">' .
+               '<a href="' . esc_url( $a['url'] ) . '" class="button button-primary" download>' . esc_html( $a['label'] ) . '</a>' .
+               '</div>';
     }
 }

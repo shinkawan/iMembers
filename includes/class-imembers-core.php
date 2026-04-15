@@ -45,5 +45,18 @@ class iMembers_Core {
         require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-subscription.php';
         $subscription = new iMembers_Subscription();
         $subscription->init();
+
+        // Load Admin Dashboard module
+        require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-admin-dashboard.php';
+        $admin_dashboard = new iMembers_Admin_Dashboard();
+        $admin_dashboard->init();
+
+        // Security: Set login expiration to 30 days
+        add_filter( 'auth_cookie_expiration', array( $this, 'set_login_expiration' ), 10, 3 );
+    }
+
+    public function set_login_expiration( $expiration, $user_id, $remember ) {
+        // Force 30 days expiration (30 * 24 * 60 * 60)
+        return 30 * DAY_IN_SECONDS;
     }
 }
