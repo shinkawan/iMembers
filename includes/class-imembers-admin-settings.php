@@ -103,5 +103,9 @@ class iMembers_Admin_Settings {
             </form>
         </div>
         <?php
+    public function render_manual_page() {
+        ob_start();
+        iMembers_Core::get_template( 'admin-manual' );
+        echo ob_get_clean();
     }
 }
