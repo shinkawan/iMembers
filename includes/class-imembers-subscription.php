@@ -233,11 +233,14 @@ class iMembers_Subscription {
         <div class="imembers-section" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
             <h3>プラン・購読管理</h3>
             <?php if ( $is_pro ) : ?>
-                <p style="color: green; font-weight: bold;">有料会員（サブスクリプション有効）</p>
-                <button type="button" id="imembers-portal-btn" style="padding: 10px 20px; cursor: pointer;">カード変更・解約手続きへ</button>
+                <p style="color: #16a34a; font-weight: 600; margin-bottom:15px; display:flex; align-items:center; gap:8px;">
+                    <svg style="width:18px;height:18px;fill:currentColor;" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    有料会員（サブスクリプション有効）
+                </p>
+                <button type="button" id="imembers-portal-btn" class="imembers-btn imembers-btn-outline">カード変更・解約手続きへ</button>
             <?php else : ?>
-                <p>現在は無料会員です。有料プランに登録すると全てのコンテンツを閲覧できます。</p>
-                <button type="button" id="imembers-checkout-btn" style="padding: 10px 20px; cursor: pointer; background: #6772e5; color: #fff; border: none;">有料プランに登録する</button>
+                <p style="margin-bottom:15px;">現在は無料会員です。有料プランに登録すると全てのコンテンツを閲覧できます。</p>
+                <button type="button" id="imembers-checkout-btn" class="imembers-btn imembers-btn-primary">有料プランに登録する</button>
             <?php endif; ?>
         </div>
 
