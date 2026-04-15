@@ -35,5 +35,10 @@ class iMembers_Core {
         require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-sns-auth.php';
         $sns_auth = new iMembers_SNS_Auth();
         $sns_auth->init();
+
+        // Load User Activity module
+        require_once IMEMBERS_PLUGIN_DIR . 'includes/class-imembers-user-activity.php';
+        $user_activity = new iMembers_User_Activity();
+        $user_activity->init();
     }
 }
